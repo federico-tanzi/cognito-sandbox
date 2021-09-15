@@ -34,9 +34,9 @@ services:
   terraform:
     image: hashicorp/terraform:0.14.10
     volumes:
-      - infra:/infra
-    working_dir: /infra/local
-    command: [ "./wait-for-it.sh", "localhost:4566", "--", "/bin/bash", "./run-local.sh" ]
+      - .:/code
+    working_dir: /code/
+    command: [ "/code/scripts/wait-for-it.sh", "localhost:4566", "--", "/bin/bash", "/code/infra/local/run-local.sh" ]
     depends_on:
       - localstack
   backend:
@@ -47,6 +47,7 @@ services:
       - .:/code
     ports:
       - "3001:3001"
+    command: [ "/code/scripts/wait-for-it.sh", "localhost:5432", "--", "./gradlew", "bootRun" ]
     depends_on:
       - db
       - localstack
