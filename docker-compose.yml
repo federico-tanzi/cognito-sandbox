@@ -35,8 +35,9 @@ services:
     image: hashicorp/terraform:0.14.10
     volumes:
       - .:/code
-    working_dir: /code/
-    command: [ "/code/scripts/wait-for-it.sh", "localhost:4566", "--", "/bin/bash", "/code/infra/local/run-local.sh" ]
+    working_dir: /code/infra/workspaces/local
+    command: ["run-local.sh" ]
+    entrypoint: "/bin/sh"
     depends_on:
       - localstack
   backend:

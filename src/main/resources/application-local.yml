@@ -23,7 +23,7 @@ logging:
     com:
       example: INFO
   pattern:
-    console: %d{yyyy-MM-dd HH:mm:ss} - %msg%n
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
 spring:
   jpa:
