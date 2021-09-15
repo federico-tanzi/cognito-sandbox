@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
+import com.ftanzi.cognito.config.CognitoConfiguration;
 import com.ftanzi.cognito.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,11 +38,8 @@ public class UserController {
 
     @Autowired
     private AWSCognitoIdentityProvider cognitoClient;
-
-    @Value(value = "${aws.cognito.userPoolId}")
-    private String userPoolId;
-    @Value(value = "${aws.cognito.clientId}")
-    private String clientId;
+    @Autowired
+    private CognitoConfiguration cognitoConfiguration;
 
     @PostMapping(path = "/sign-up")
     public void signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
@@ -54,7 +52,7 @@ public class UserController {
                     new AttributeType().withName("email_verified").withValue("true");
 
             AdminCreateUserRequest userRequest = new AdminCreateUserRequest()
-                    .withUserPoolId(userPoolId).withUsername(userSignUpRequest.getUsername())
+                    .withUserPoolId(cognitoConfiguration.getUserPoolId()).withUsername(userSignUpRequest.getUsername())
                     .withTemporaryPassword(userSignUpRequest.getPassword())
                     .withUserAttributes(emailAttr, emailVerifiedAttr)
                     .withMessageAction(MessageActionType.SUPPRESS)
@@ -68,7 +66,7 @@ public class UserController {
             // Disable force change password during first login
             AdminSetUserPasswordRequest adminSetUserPasswordRequest =
                     new AdminSetUserPasswordRequest().withUsername(userSignUpRequest.getUsername())
-                            .withUserPoolId(userPoolId)
+                            .withUserPoolId(cognitoConfiguration.getUserPoolId())
                             .withPassword(userSignUpRequest.getPassword()).withPermanent(true);
 
             cognitoClient.adminSetUserPassword(adminSetUserPasswordRequest);
@@ -91,8 +89,8 @@ public class UserController {
         authParams.put("PASSWORD", userSignInRequest.getPassword());
 
         final AdminInitiateAuthRequest authRequest = new AdminInitiateAuthRequest();
-        authRequest.withAuthFlow(AuthFlowType.ADMIN_NO_SRP_AUTH).withClientId(clientId)
-                .withUserPoolId(userPoolId).withAuthParameters(authParams);
+        authRequest.withAuthFlow(AuthFlowType.ADMIN_NO_SRP_AUTH).withClientId(cognitoConfiguration.getClientId())
+                .withUserPoolId(cognitoConfiguration.getUserPoolId()).withAuthParameters(authParams);
 
         try {
             AdminInitiateAuthResult result = cognitoClient.adminInitiateAuth(authRequest);
@@ -120,7 +118,7 @@ public class UserController {
                                 new AdminRespondToAuthChallengeRequest()
                                         .withChallengeName(ChallengeNameType.NEW_PASSWORD_REQUIRED)
                                         .withChallengeResponses(challengeResponses)
-                                        .withClientId(clientId).withUserPoolId(userPoolId)
+                                        .withClientId(cognitoConfiguration.getClientId()).withUserPoolId(cognitoConfiguration.getUserPoolId())
                                         .withSession(result.getSession());
 
                         AdminRespondToAuthChallengeResult resultChallenge =

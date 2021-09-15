@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:53:53"
+      - "127.0.0.1:443:443"
+      - "127.0.0.1:4510-4530:4510-4530"
+      - "127.0.0.1:4566-4620:4566-4620"
+    environment:
+      - LOCALSTACK_API_KEY=5kdlBfm5jz
+      - SERVICES=cognito,s3,ssm
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOST_TMP_FOLDER=${TMPDIR}
+    volumes:
+      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+  terraform:
+    image: hashicorp/terraform:0.14.10
+    volumes:
+      - infra:/infra
+    working_dir: /infra/local
+    command: [ "./wait-for-it.sh", "localhost:4566", "--", "/bin/bash", "./run-local.sh" ]
+    depends_on:
+      - localstack
+  backend:
+    build: .
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+    volumes:
+      - .:/code
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+      - localstack

@@ -1,0 +1,43 @@
+
+server:
+  port: 3001
+
+cloud:
+  aws:
+    region:
+      static: us-east-1
+aws:
+  access-key: test
+  access-secret: test
+  region: us-east-1
+  cognito:
+    endpoint: http://localhost:4566
+    region: us-east-1
+    connectionTimeout: 2000
+    readTimeout: 2000
+
+logging:
+  level:
+    org:
+      springframework: INFO
+    com:
+      example: INFO
+  pattern:
+    console: %d{yyyy-MM-dd HH:mm:ss} - %msg%n
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:4566/${aws.cognito.userPoolId}
