@@ -47,7 +47,7 @@ services:
     volumes:
       - .:/code
     network_mode: "host"
-    command: [ "/code/scripts/wait-for-it.sh", "localstack:4566", "--", "./gradlew", "bootRun" ]
+    command: [ "/code/scripts/wait-for-it.sh", "localhost:4566", "--", "./gradlew", "bootRun" ]
     depends_on:
       - localstack
       - terraform
