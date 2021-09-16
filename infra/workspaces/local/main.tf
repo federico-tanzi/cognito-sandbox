@@ -1,32 +1,34 @@
 provider "aws" {
-  access_key                  = "mock_access_key"
+  access_key                  = "test"
   region                      = "us-east-1"
   s3_force_path_style         = true
-  secret_key                  = "mock_secret_key"
+  secret_key                  = "test"
   skip_credentials_validation = true
   skip_metadata_api_check     = true
   skip_requesting_account_id  = true
 
   endpoints {
-    apigateway     = "http://localhost:4566"
-    cloudformation = "http://localhost:4566"
-    cloudwatch     = "http://localhost:4566"
-    dynamodb       = "http://localhost:4566"
-    es             = "http://localhost:4566"
-    firehose       = "http://localhost:4566"
-    iam            = "http://localhost:4566"
-    kinesis        = "http://localhost:4566"
-    lambda         = "http://localhost:4566"
-    route53        = "http://localhost:4566"
-    redshift       = "http://localhost:4566"
-    s3             = "http://localhost:4566"
-    secretsmanager = "http://localhost:4566"
-    ses            = "http://localhost:4566"
-    sns            = "http://localhost:4566"
-    sqs            = "http://localhost:4566"
-    ssm            = "http://localhost:4566"
-    stepfunctions  = "http://localhost:4566"
-    sts            = "http://localhost:4566"
+    apigateway     = "http://localstack:4566"
+    cloudformation = "http://localstack:4566"
+    cloudwatch     = "http://localstack:4566"
+    dynamodb       = "http://localstack:4566"
+    es             = "http://localstack:4566"
+    firehose       = "http://localstack:4566"
+    iam            = "http://localstack:4566"
+    kinesis        = "http://localstack:4566"
+    lambda         = "http://localstack:4566"
+    route53        = "http://localstack:4566"
+    redshift       = "http://localstack:4566"
+    s3             = "http://localstack:4566"
+    secretsmanager = "http://localstack:4566"
+    ses            = "http://localstack:4566"
+    sns            = "http://localstack:4566"
+    sqs            = "http://localstack:4566"
+    ssm            = "http://localstack:4566"
+    stepfunctions  = "http://localstack:4566"
+    sts            = "http://localstack:4566"
+    cognitoidentity = "http://localstack:4566"
+    cognitoidp = "http://localstack:4566"
   }
 }
 

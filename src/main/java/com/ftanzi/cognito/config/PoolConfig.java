@@ -1,10 +1,10 @@
 package com.ftanzi.cognito.config;
 
-public class CognitoConfiguration {
+public class PoolConfig {
     private String userPoolId;
     private String clientId;
 
-    public CognitoConfiguration(String userPoolId, String clientId) {
+    public PoolConfig(String userPoolId, String clientId) {
         this.userPoolId = userPoolId;
         this.clientId = clientId;
     }

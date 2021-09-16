@@ -48,7 +48,7 @@ services:
       - .:/code
     ports:
       - "3001:3001"
-    command: [ "/code/scripts/wait-for-it.sh", "localhost:5432", "--", "./gradlew", "bootRun" ]
+    command: [ "/code/scripts/wait-for-it.sh", "localstack:4566", "--", "./gradlew", "bootRun" ]
     depends_on:
       - db
       - localstack
