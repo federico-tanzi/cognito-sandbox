@@ -33,7 +33,7 @@ public class CognitoConfig {
     private String stage;
 
     @Autowired
-    private AWSSimpleSystemsManagement ssmClient;
+    private AWSSimpleSystemsManagement simpleSystemsManagement;
 
     @Bean
     public AWSCognitoIdentityProvider cognitoClient() {
@@ -47,7 +47,7 @@ public class CognitoConfig {
     }
 
     @Bean
-    public AWSSimpleSystemsManagement ssmClient(){
+    public AWSSimpleSystemsManagement simpleSystemsManagement(){
         BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
         return AWSSimpleSystemsManagementClientBuilder.standard()
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsEndpoint, awsRegion))
@@ -56,16 +56,13 @@ public class CognitoConfig {
     }
 
     @Bean
-    public CognitoConfiguration cognitoConfig(){
+    public PoolConfig poolConfig(){
         String userPoolIdConfigName = "/cognito/userPool/id/" + stage;
         String clientIdConfigName = "/cognito/client/id/" + stage;
         GetParametersRequest parameterRequest = new GetParametersRequest().withNames("/cognito/userPool/id/${var.stage}");
-
-        GetParametersResult parameterResponse = ssmClient.getParameters(parameterRequest);
+        GetParametersResult parameterResponse = simpleSystemsManagement.getParameters(parameterRequest);
         Map<String, String> configs = parameterResponse.getParameters().stream().collect(Collectors.toMap(Parameter::getName, Parameter::getValue));
-        return new CognitoConfiguration(configs.get(userPoolIdConfigName),configs.get(clientIdConfigName));
+        return new PoolConfig(configs.get(userPoolIdConfigName),configs.get(clientIdConfigName));
     }
-
-
 
 }

@@ -2,12 +2,10 @@ package com.ftanzi.cognito.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 
-import com.ftanzi.cognito.config.CognitoConfiguration;
+import com.ftanzi.cognito.config.PoolConfig;
 import com.ftanzi.cognito.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +25,6 @@ import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.AuthFlowType;
 import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
 import com.amazonaws.services.cognitoidp.model.ChallengeNameType;
-import com.amazonaws.services.cognitoidp.model.ChangePasswordRequest;
 import com.amazonaws.services.cognitoidp.model.DeliveryMediumType;
 import com.amazonaws.services.cognitoidp.model.InvalidParameterException;
 import com.amazonaws.services.cognitoidp.model.MessageActionType;
@@ -39,7 +36,7 @@ public class UserController {
     @Autowired
     private AWSCognitoIdentityProvider cognitoClient;
     @Autowired
-    private CognitoConfiguration cognitoConfiguration;
+    private PoolConfig poolConfig;
 
     @PostMapping(path = "/sign-up")
     public void signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
@@ -52,7 +49,7 @@ public class UserController {
                     new AttributeType().withName("email_verified").withValue("true");
 
             AdminCreateUserRequest userRequest = new AdminCreateUserRequest()
-                    .withUserPoolId(cognitoConfiguration.getUserPoolId()).withUsername(userSignUpRequest.getUsername())
+                    .withUserPoolId(poolConfig.getUserPoolId()).withUsername(userSignUpRequest.getUsername())
                     .withTemporaryPassword(userSignUpRequest.getPassword())
                     .withUserAttributes(emailAttr, emailVerifiedAttr)
                     .withMessageAction(MessageActionType.SUPPRESS)
@@ -66,7 +63,7 @@ public class UserController {
             // Disable force change password during first login
             AdminSetUserPasswordRequest adminSetUserPasswordRequest =
                     new AdminSetUserPasswordRequest().withUsername(userSignUpRequest.getUsername())
-                            .withUserPoolId(cognitoConfiguration.getUserPoolId())
+                            .withUserPoolId(poolConfig.getUserPoolId())
                             .withPassword(userSignUpRequest.getPassword()).withPermanent(true);
 
             cognitoClient.adminSetUserPassword(adminSetUserPasswordRequest);
@@ -89,8 +86,8 @@ public class UserController {
         authParams.put("PASSWORD", userSignInRequest.getPassword());
 
         final AdminInitiateAuthRequest authRequest = new AdminInitiateAuthRequest();
-        authRequest.withAuthFlow(AuthFlowType.ADMIN_NO_SRP_AUTH).withClientId(cognitoConfiguration.getClientId())
-                .withUserPoolId(cognitoConfiguration.getUserPoolId()).withAuthParameters(authParams);
+        authRequest.withAuthFlow(AuthFlowType.ADMIN_NO_SRP_AUTH).withClientId(poolConfig.getClientId())
+                .withUserPoolId(poolConfig.getUserPoolId()).withAuthParameters(authParams);
 
         try {
             AdminInitiateAuthResult result = cognitoClient.adminInitiateAuth(authRequest);
@@ -118,7 +115,7 @@ public class UserController {
                                 new AdminRespondToAuthChallengeRequest()
                                         .withChallengeName(ChallengeNameType.NEW_PASSWORD_REQUIRED)
                                         .withChallengeResponses(challengeResponses)
-                                        .withClientId(cognitoConfiguration.getClientId()).withUserPoolId(cognitoConfiguration.getUserPoolId())
+                                        .withClientId(poolConfig.getClientId()).withUserPoolId(poolConfig.getUserPoolId())
                                         .withSession(result.getSession());
 
                         AdminRespondToAuthChallengeResult resultChallenge =

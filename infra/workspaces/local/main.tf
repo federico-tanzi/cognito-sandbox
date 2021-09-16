@@ -42,6 +42,9 @@ module "user_pool" {
   stage = local.stage
 }
 
+output "poolId" {
+  value = module.user_pool.poolId
+}
 
 terraform {
   required_providers {

@@ -9,3 +9,7 @@ resource "aws_ssm_parameter" "clientId" {
   type  = "String"
   value = aws_cognito_user_pool_client.client.id
 }
+
+output "poolId" {
+  value = aws_cognito_user_pool.pool.id
+}

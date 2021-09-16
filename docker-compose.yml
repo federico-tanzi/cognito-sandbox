@@ -40,15 +40,11 @@ services:
     entrypoint: "/bin/sh"
     depends_on:
       - localstack
-  backend:
-    build: .
-    environment:
-      - SPRING_PROFILES_ACTIVE=local
-    volumes:
-      - .:/code
-    ports:
-      - "3001:3001"
-    command: [ "/code/scripts/wait-for-it.sh", "localstack:4566", "--", "./gradlew", "bootRun" ]
-    depends_on:
-      - db
-      - localstack
+#  backend:
+#    build: .
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=local
+#    volumes:
+#      - .:/code
+#    network_mode: "host"
+#    command: [ "/code/scripts/wait-for-it.sh", "localstack:4566", "--", "./gradlew", "bootRun" ]
