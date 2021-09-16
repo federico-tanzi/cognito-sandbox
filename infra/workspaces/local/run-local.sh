@@ -3,4 +3,4 @@ apk add --no-cache bash
 terraform init
 terraform plan
 terraform apply --auto-approve
-terraform output poolId >> ../../../user_pool_id.txt
+terraform output poolId > ../../../user_pool_id.txt
