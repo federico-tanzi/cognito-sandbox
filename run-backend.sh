@@ -1,3 +1,5 @@
+rm -rf build
+rm -rf .gradle
 docker-compose up
 export SPRING_PROFILES_ACTIVE=local
 ./code/scripts/wait-for-it.sh localstack:4566
