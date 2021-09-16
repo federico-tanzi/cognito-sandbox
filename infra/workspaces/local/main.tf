@@ -33,7 +33,7 @@ provider "aws" {
 }
 
 locals {
-  stage = "develop"
+  stage = "local"
   region = "us-east-1"
 }
 

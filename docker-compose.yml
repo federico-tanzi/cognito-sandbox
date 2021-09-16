@@ -1,14 +1,14 @@
 version: "3"
 
 services:
-  db:
-    image: postgres
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - 5432:5432
+#  db:
+#    image: postgres
+#    environment:
+#      - POSTGRES_DB=postgres
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=postgres
+#    ports:
+#      - 5432:5432
   adminer:
     image: adminer
     restart: always
@@ -40,11 +40,14 @@ services:
     entrypoint: "/bin/sh"
     depends_on:
       - localstack
-#  backend:
-#    build: .
-#    environment:
-#      - SPRING_PROFILES_ACTIVE=local
-#    volumes:
-#      - .:/code
-#    network_mode: "host"
-#    command: [ "/code/scripts/wait-for-it.sh", "localstack:4566", "--", "./gradlew", "bootRun" ]
+  backend:
+    build: .
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+    volumes:
+      - .:/code
+    network_mode: "host"
+    command: [ "/code/scripts/wait-for-it.sh", "localstack:4566", "--", "./gradlew", "bootRun" ]
+    depends_on:
+      - localstack
+      - terraform

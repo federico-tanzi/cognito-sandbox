@@ -1,0 +1,72 @@
+package com.ftanzi.cognito.config;
+
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagement;
+import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagementClientBuilder;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.util.ObjectUtils;
+
+public class ParameterStorePropertySourceEnvironmentPostProcessor implements EnvironmentPostProcessor {
+
+	static final String PARAMETER_STORE_ACCEPTED_PROFILE = "awsParameterStorePropertySourceEnabled";
+
+	static final String PARAMETER_STORE_ACCEPTED_PROFILES_CONFIGURATION_PROPERTY = "awsParameterStorePropertySource.enabledProfiles";
+	static final String PARAMETER_STORE_ENABLED_CONFIGURATION_PROPERTY = "awsParameterStorePropertySource.enabled";
+	static final String PARAMETER_STORE_HALT_BOOT_CONFIGURATION_PROPERTY = "awsParameterStorePropertySource.haltBoot";
+
+	private static final String PARAMETER_STORE_PROPERTY_SOURCE_NAME = "AWSParameterStorePropertySource";
+
+	private boolean initialized;
+
+	@Override
+	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+
+		if (!initialized && isParameterStorePropertySourceEnabled(environment)) {
+
+			environment.getPropertySources()
+					.addFirst(new ParameterStorePropertySource(PARAMETER_STORE_PROPERTY_SOURCE_NAME,
+							new ParameterStoreSource(
+									getAwsSystemManager(environment),
+									environment.getProperty(PARAMETER_STORE_HALT_BOOT_CONFIGURATION_PROPERTY, Boolean.class, Boolean.FALSE))));
+
+			System.out.println("Created Environment from AWS Parameter Store: " + environment.getPropertySources());
+
+			initialized = true;
+		}
+	}
+
+	private AWSSimpleSystemsManagement getAwsSystemManager(ConfigurableEnvironment environment) {
+
+		System.out.println("Initializing Environment from AWS Parameter Store");
+
+		AWSCredentialsProvider credentials =
+				new AWSStaticCredentialsProvider(
+						new BasicAWSCredentials(
+								environment.getProperty("aws.access-key"),
+								environment.getProperty("aws.access-secret")));
+
+		System.out.println("Initialized AWS Credentials Provider");
+
+		return AWSSimpleSystemsManagementClientBuilder
+				.standard()
+				.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(environment.getProperty("aws.endpoint"), environment.getProperty("aws.region")))
+				.withCredentials(credentials)
+				.build();
+	}
+
+	private boolean isParameterStorePropertySourceEnabled(ConfigurableEnvironment environment) {
+
+		String[] userDefinedEnabledProfiles =
+				environment.getProperty(PARAMETER_STORE_ACCEPTED_PROFILES_CONFIGURATION_PROPERTY, String[].class);
+
+		return environment.getProperty(PARAMETER_STORE_ENABLED_CONFIGURATION_PROPERTY, Boolean.class, Boolean.FALSE)
+				|| environment.acceptsProfiles(PARAMETER_STORE_ACCEPTED_PROFILE)
+				|| (!ObjectUtils.isEmpty(userDefinedEnabledProfiles) && environment.acceptsProfiles(userDefinedEnabledProfiles));
+
+	}
+}

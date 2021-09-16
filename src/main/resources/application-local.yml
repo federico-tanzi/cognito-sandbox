@@ -1,6 +1,6 @@
 
 server:
-  port: 3001
+  port: 8000
 
 cloud:
   aws:
@@ -10,8 +10,10 @@ aws:
   access-key: test
   access-secret: test
   region: us-east-1
+  endpoint: http://localhost:4566
   cognito:
-    endpoint: http://localhost:4566
+    userPoolId: ${/cognito/userPool/id/local}
+    clientId: ${/cognito/userPool/client/id/local}
     region: us-east-1
     connectionTimeout: 2000
     readTimeout: 2000
@@ -40,4 +42,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:4566/${USER_POOL_ID}
+          issuer-uri: http://localhost:4566/${/cognito/userPool/id/local}
