@@ -40,4 +40,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:4566/us-east-1_a100cf19786f407994d963150ef925b3
+          issuer-uri: http://localhost:4566/${USER_POOL_ID}
